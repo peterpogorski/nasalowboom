@@ -54,6 +54,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void drawBoomLocation(){
+        float D_1 = 1;
+        float D_2; // what distance away (Radius)
+        float decibel_1 = 150;
+        float decibel_2 = ((D_1/D_2)^2)*decibel_1; // what the decibel at d_2 is
         if(mMap != null) {
             int d = 500; // diameter
             Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
