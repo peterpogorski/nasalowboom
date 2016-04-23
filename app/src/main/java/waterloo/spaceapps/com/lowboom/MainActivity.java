@@ -32,6 +32,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng mLatLng;
     private Button mButton;
     private ImageView mJet;
+    private int mButtonHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,13 +96,21 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        mButtonHeight = mButton.getHeight();
+    }
+
+
     private void animatePlane(){
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int height = displaymetrics.heightPixels;
+        int height = displaymetrics.heightPixels - (mButtonHeight);
         int width = displaymetrics.widthPixels;
+
         Animation animation = new TranslateAnimation(0.0f, width, (height/2), (height/2));
-        animation.setDuration(2000);
+        animation.setDuration(1500);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
