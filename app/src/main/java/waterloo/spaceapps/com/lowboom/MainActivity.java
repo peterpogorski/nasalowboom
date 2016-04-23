@@ -41,11 +41,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ImageView mJet;
     private int mButtonHeight;
-    private MediaPlayer mMediaPlayer;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private double decibel_1;
     private int mColor;
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 decibel_1 = 150;
                 mColor = getResources().getColor(R.color.colorPrimary);
                 mJet.setImageDrawable(getResources().getDrawable(R.drawable.fighter_jet));
+                mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sonic);
                 animatePlane();
             }
         });
@@ -77,6 +78,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 decibel_1 = 140;
                 mColor = getResources().getColor(R.color.color1);
                 mJet.setImageDrawable(getResources().getDrawable(R.drawable.low_jet));
+                mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.low);
                 animatePlane();
             }
         });
@@ -114,6 +116,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         mMap.setMyLocationEnabled(true);
 
         //centerMapOnMyLocation();
@@ -190,15 +193,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.d1);
-                mMediaPlayer.start();
                 mJet.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
                 mJet.setVisibility(View.GONE);
-                mMediaPlayer.stop();
+                mMediaPlayer.start();
                 drawBoomLocation();
             }
 
