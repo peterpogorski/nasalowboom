@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
@@ -49,6 +50,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 animatePlane();
+                playBoomSound();
             }
         });
 
@@ -148,5 +150,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(mLatLng));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLng, 14));
 
+    }
+
+    private void playBoomSound() {
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.d1);
+        mediaPlayer.start();
     }
 }
