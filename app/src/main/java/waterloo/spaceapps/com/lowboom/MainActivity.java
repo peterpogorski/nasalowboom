@@ -35,31 +35,56 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private LatLng mLatLng;
-    private Button mButton;
+    private Button mButtonSonic;
+    private Button mButtonLow;
+    private Button mButtonClear;
+
     private ImageView mJet;
     private int mButtonHeight;
     private MediaPlayer mMediaPlayer;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-
-
-
+    private double decibel_1;
+    private int mColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_view);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
-        mButton = (Button) findViewById(R.id.sonic_boom);
+        mButtonSonic = (Button) findViewById(R.id.sonic_boom);
+        mButtonClear = (Button) findViewById(R.id.clear);
+        mButtonLow = (Button) findViewById(R.id.low_boom);
+
         mJet = (ImageView) findViewById(R.id.jet);
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        mButtonSonic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                decibel_1 = 150;
+                mColor = getResources().getColor(R.color.colorPrimary);
+                mJet.setImageDrawable(getResources().getDrawable(R.drawable.fighter_jet));
                 animatePlane();
+            }
+        });
+
+        mButtonLow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decibel_1 = 140;
+                mColor = getResources().getColor(R.color.color1);
+                mJet.setImageDrawable(getResources().getDrawable(R.drawable.low_jet));
+                animatePlane();
+            }
+        });
+
+        mButtonClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearMap();
             }
         });
 
@@ -114,60 +139,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void drawBoomLocation(){
         double d_1 = 1;
         //double d_2 = 1; // what distance away (Radius)
-        double inaudible = 10;
-        double decibel_1 = 150;
+        double inaudible = 90;
         //double decibel_2 = Math.pow((d_1/d_2), 2)* decibel_1; // what the decibel at d_2 is
 
         double inaudible_distance = d_1/(Math.pow(10,(inaudible-decibel_1)/20));
 
         if(mMap != null) {
-            int d = (int)inaudible_distance; // diameter
+            int d = (int)(inaudible_distance); // diameter
             int radiusM = 200;
-            Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(bm);
-            Paint p = new Paint();
-            p.setColor(getResources().getColor(R.color.color1));
-            c.drawCircle(d / 2, d / 2, d / 2, p);
-
-            Bitmap bm2 = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
-            Canvas c2 = new Canvas(bm2);
-            Paint p2 = new Paint();
-            p2.setColor(getResources().getColor(R.color.color2));
-            c2.drawCircle(d / 2, d / 2, d / 2, p2);
-
-            Bitmap bm3 = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
-            Canvas c3 = new Canvas(bm3);
-            Paint p3 = new Paint();
-            p3.setColor(getResources().getColor(R.color.color3));
-            c3.drawCircle(d / 2, d / 2, d / 2, p3);
 
             Bitmap bm4 = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
             Canvas c4 = new Canvas(bm4);
             Paint p4 = new Paint();
-            p4.setColor(getResources().getColor(R.color.color4));
+            p4.setColor(mColor);
             c4.drawCircle(d / 2, d / 2, d / 2, p4);
 
 
             // generate BitmapDescriptor from circle Bitmap
-            BitmapDescriptor bmD = BitmapDescriptorFactory.fromBitmap(bm);
-            BitmapDescriptor bmD2 = BitmapDescriptorFactory.fromBitmap(bm2);
-            BitmapDescriptor bmD3 = BitmapDescriptorFactory.fromBitmap(bm3);
             BitmapDescriptor bmD4 = BitmapDescriptorFactory.fromBitmap(bm4);
 
-            // mapView is the GoogleMap
-            mMap.addGroundOverlay(new GroundOverlayOptions().
-                    image(bmD).
-                    position(mLatLng, (float)inaudible_distance * (1/4), (float)inaudible_distance * (1/4)).
-                    transparency(0.4f));
-
-            mMap.addGroundOverlay(new GroundOverlayOptions().
-                    image(bmD2).
-                    position(mLatLng, (float)inaudible_distance * (2/4), (float)inaudible_distance * (2/4)).
-                    transparency(0.4f));
-            mMap.addGroundOverlay(new GroundOverlayOptions().
-                    image(bmD3).
-                    position(mLatLng, (float)inaudible_distance * (3/4), (float)inaudible_distance * (3/4)).
-                    transparency(0.4f));
             mMap.addGroundOverlay(new GroundOverlayOptions().
                     image(bmD4).
                     position(mLatLng, (float)inaudible_distance, (float)inaudible_distance).
@@ -179,7 +169,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        mButtonHeight = mButton.getHeight();
+        mButtonHeight = mButtonSonic.getHeight();
     }
 
 
@@ -220,6 +210,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         float decibel_1 = 150;
         double decibel_2 = Math.pow((d_1/d_2), 2)*decibel_1; // what the decibel at d_2 is
         return decibel_2;
+    }
+
+    private void clearMap(){
+        if(mMap != null){
+            mMap.clear();
+        }
     }
 
 
