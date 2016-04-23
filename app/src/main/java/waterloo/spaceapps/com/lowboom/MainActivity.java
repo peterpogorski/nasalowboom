@@ -148,21 +148,27 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             int d = (int)(inaudible_distance); // diameter
             int radiusM = 200;
 
+            Bitmap bm = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(bm);
+            Paint p = new Paint();
+            p.setColor(getResources().getColor(R.color.color1));
+            c.drawCircle(d / 2, d / 2, d / 2, p);
+
+            // generate BitmapDescriptor from circle Bitmap
+
             Bitmap bm4 = Bitmap.createBitmap(d, d, Bitmap.Config.ARGB_8888);
             Canvas c4 = new Canvas(bm4);
             Paint p4 = new Paint();
             p4.setColor(mColor);
             c4.drawCircle(d / 2, d / 2, d / 2, p4);
 
-
-            // generate BitmapDescriptor from circle Bitmap
             BitmapDescriptor bmD4 = BitmapDescriptorFactory.fromBitmap(bm4);
+
 
             mMap.addGroundOverlay(new GroundOverlayOptions().
                     image(bmD4).
                     position(mLatLng, (float)inaudible_distance, (float)inaudible_distance).
                     transparency(0.4f));
-
         }
     }
 
@@ -204,20 +210,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mJet.startAnimation(animation);
     }
 
-    private double calculateRadius(){
-        float d_1 = 1;
-        float d_2 = 1; // what distance away (Radius)
-        float decibel_1 = 150;
-        double decibel_2 = Math.pow((d_1/d_2), 2)*decibel_1; // what the decibel at d_2 is
-        return decibel_2;
-    }
-
     private void clearMap(){
         if(mMap != null){
             mMap.clear();
         }
     }
-
 
     private void centerMapOnMyLocation(double userLatitude ,double userLongitude) {
 
