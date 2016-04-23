@@ -1,6 +1,7 @@
 package waterloo.spaceapps.com.lowboom;
 
 import android.animation.Animator;
+import android.content.ComponentCallbacks;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -15,6 +16,9 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,7 +31,7 @@ import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
     private LatLng mLatLng;
@@ -35,6 +39,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageView mJet;
     private int mButtonHeight;
     private MediaPlayer mMediaPlayer;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +65,50 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         mapFragment.getMapAsync(this);
 
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        centerMapOnMyLocation();
+        mMap.setMyLocationEnabled(true);
+
+        //centerMapOnMyLocation();
+    }
+
+
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            centerMapOnMyLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        }
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
     private void drawBoomLocation(){
@@ -70,7 +117,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         double inaudible = 10;
         double decibel_1 = 150;
         //double decibel_2 = Math.pow((d_1/d_2), 2)* decibel_1; // what the decibel at d_2 is
-        double inaudible_distance = d_1 / Math.sqrt(inaudible/decibel_1);
+        double inaudible_distance = 1000;
         if(mMap != null) {
             int d = (int)inaudible_distance; // diameter
             int radiusM = 200;
@@ -174,14 +221,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private void centerMapOnMyLocation() {
+    private void centerMapOnMyLocation(double userLatitude ,double userLongitude) {
 
-        mMap.setMyLocationEnabled(true);
 
-        mLatLng = new LatLng(43.451096, -80.498792);
+        mLatLng = new LatLng(userLatitude, userLongitude);
         mMap.addMarker(new MarkerOptions().position(mLatLng));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLng, 14));
 
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 }
