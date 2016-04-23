@@ -34,6 +34,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private Button mButton;
     private ImageView mJet;
     private int mButtonHeight;
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 animatePlane();
-                playBoomSound();
             }
         });
 
@@ -116,19 +116,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.d1);
+                mMediaPlayer.start();
                 mJet.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
                 mJet.setVisibility(View.GONE);
+                mMediaPlayer.stop();
                 drawBoomLocation();
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
 
-            }   
+            }
         });
         mJet.startAnimation(animation);
     }
@@ -152,8 +155,4 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void playBoomSound() {
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.d1);
-        mediaPlayer.start();
-    }
 }
