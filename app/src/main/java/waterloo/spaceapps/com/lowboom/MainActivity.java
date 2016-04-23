@@ -128,7 +128,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onAnimationRepeat(Animation animation) {
 
-            }
+            }   
         });
         mJet.startAnimation(animation);
     }
