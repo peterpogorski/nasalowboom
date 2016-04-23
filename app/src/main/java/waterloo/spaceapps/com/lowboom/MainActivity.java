@@ -66,11 +66,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void drawBoomLocation(){
         double d_1 = 1;
-        double d_2 = 1; // what distance away (Radius)
+        //double d_2 = 1; // what distance away (Radius)
         double inaudible = 10;
         double decibel_1 = 150;
         //double decibel_2 = Math.pow((d_1/d_2), 2)* decibel_1; // what the decibel at d_2 is
-        double inaudible_distance = d_1 / Math.sqrt(inaudible/decibel_1);
+        double inaudible_distance = d_1/(Math.pow(10,(inaudible-decibel_1)/20));
         if(mMap != null) {
             int d = (int)inaudible_distance; // diameter
             int radiusM = 200;
