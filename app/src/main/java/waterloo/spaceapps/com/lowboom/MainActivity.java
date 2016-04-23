@@ -1,14 +1,19 @@
 package waterloo.spaceapps.com.lowboom;
 
+import android.animation.Animator;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.location.Location;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.FloatMath;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,6 +32,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LatLng mLatLng;
     private Button mButton;
+    private ImageView mJet;
+    private int mButtonHeight;
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +45,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
 
         mButton = (Button) findViewById(R.id.sonic_boom);
+        mJet = (ImageView) findViewById(R.id.jet);
+
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawBoomLocation();
+                animatePlane();
             }
         });
 
@@ -61,7 +71,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         double decibel_1 = 150;
         //double decibel_2 = Math.pow((d_1/d_2), 2)* decibel_1; // what the decibel at d_2 is
         double inaudible_distance = d_1 / Math.sqrt(inaudible/decibel_1);
-
         if(mMap != null) {
             int d = (int)inaudible_distance; // diameter
             int radiusM = 200;
@@ -114,7 +123,54 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     image(bmD4).
                     position(mLatLng, (float)inaudible_distance, (float)inaudible_distance).
                     transparency(0.4f));
+
         }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        mButtonHeight = mButton.getHeight();
+    }
+
+
+    private void animatePlane(){
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int height = displaymetrics.heightPixels - (mButtonHeight);
+        int width = displaymetrics.widthPixels;
+
+        Animation animation = new TranslateAnimation(0.0f, width, (height/2), (height/2));
+        animation.setDuration(1500);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mMediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.d1);
+                mMediaPlayer.start();
+                mJet.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mJet.setVisibility(View.GONE);
+                mMediaPlayer.stop();
+                drawBoomLocation();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mJet.startAnimation(animation);
+    }
+
+    private double calculateRadius(){
+        float d_1 = 1;
+        float d_2 = 1; // what distance away (Radius)
+        float decibel_1 = 150;
+        double decibel_2 = Math.pow((d_1/d_2), 2)*decibel_1; // what the decibel at d_2 is
+        return decibel_2;
     }
 
 
@@ -127,4 +183,5 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLatLng, 14));
 
     }
+
 }
